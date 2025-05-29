@@ -1,7 +1,7 @@
 import os
 import requests
-
-# os.environ['DEEPSEEK_API_KEY'] = 'sk-ML3aIfbBf8MFnnQFdBOVcbdqRvkZ1qoqm2ttOSofQTJFO6LO'
+#$env:DEEPSEEK_API_KEY="sk-ML3aIfbBf8MFnnQFdBOVcbdqRvkZ1qoqm2ttOSofQTJFO6LO"
+#os.environ['DEEPSEEK_API_KEY'] = 'sk-ML3aIfbBf8MFnnQFdBOVcbdqRvkZ1qoqm2ttOSofQTJFO6LO'
 
 def deepseek_chat(query: str) -> str:
     api_key = os.getenv("DEEPSEEK_API_KEY")
@@ -13,7 +13,7 @@ def deepseek_chat(query: str) -> str:
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "gpt-4o",
+        "model": "gpt-4o-mini",
         "messages": [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": query}
@@ -39,16 +39,16 @@ def extract_keywords(natural_question):
 def summarize_and_rank_papers(question, papers):
     # 拼接 prompt
     context = "\n\n".join(
-        [f"Title: {p['title']}\nAuthors: {p['authors']}\nPublished: {p['published']}\nSummary: {p['summary']}" 
+        [f"Title: {p['title']}\nAuthors: {p['authors']}\nPublished: {p['published']}\nSummary: {p['summary']}\nPdf_link: {p['pdf_link']}" 
          for p in papers]
     )
     prompt = (
         f"用户问题：{question}\n\n"
         "以下是与问题相关的arXiv论文，请为相关性和新颖性分别打分，并通过总分对它们进行排序，"
-        "输出总分最高的5篇论文的相关性分，新颖性分，总分、标题、PDF地址、简要总结和这篇文章为啥可以回答用户相关问题。输出为中文\n\n"
+        "输出总分最高的5篇论文的相关性分，新颖性分，总分、标题、PDF地址(根据pdf_link一致)、简要总结和这篇文章为啥可以回答用户相关问题。输出为中文\n\n"
         f"{context}"
     )
-    print(prompt)
+    print(prompt[:10000])  # 打印前1000个字符，避免过长
     return deepseek_chat(prompt[:10000])  # 限制最大长度，避免过长的请求
 
 # 示例用法
