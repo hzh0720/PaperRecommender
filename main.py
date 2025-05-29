@@ -4,12 +4,13 @@ from arxiv import search_arxiv,deduplicate_papers
 
 
 def main():
-    import os
-
     # 用户输入
     question = input("请输入你的问题：")
-    preference = input("请输入你的偏好类型（如AI领域填cs.AI，留空为不限）：")
+    preference_desc = input("请输入你的问题偏好，留空为无：")
+    category = input("请输入论文类别（如人工智能cs.AI，机器学习cs.LG，量子物理quant-ph，经济学econ.EM等，留空为不限）：")
     
+    question = f"{question}。{preference_desc}"
+
     keywords = extract_keywords(question)
     print(f"\n提取的关键词：{keywords}\n")
 
@@ -19,7 +20,7 @@ def main():
         print(f"正在检索关键词：{kw} ...")
         if not kw:
             continue
-        papers = search_arxiv(kw, max_results=5, category=preference, sort_by="relevance")
+        papers = search_arxiv(kw, max_results=5, category=category, sort_by="relevance")
         all_papers.extend(papers)
     all_papers = deduplicate_papers(all_papers)
     if not all_papers:

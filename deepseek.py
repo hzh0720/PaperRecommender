@@ -1,7 +1,7 @@
 import os
 import requests
 #$env:DEEPSEEK_API_KEY="sk-ML3aIfbBf8MFnnQFdBOVcbdqRvkZ1qoqm2ttOSofQTJFO6LO"
-#os.environ['DEEPSEEK_API_KEY'] = 'sk-ML3aIfbBf8MFnnQFdBOVcbdqRvkZ1qoqm2ttOSofQTJFO6LO'
+os.environ['DEEPSEEK_API_KEY'] = 'sk-ML3aIfbBf8MFnnQFdBOVcbdqRvkZ1qoqm2ttOSofQTJFO6LO'
 
 def deepseek_chat(query: str) -> str:
     api_key = os.getenv("DEEPSEEK_API_KEY")
