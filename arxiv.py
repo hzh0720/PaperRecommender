@@ -27,6 +27,18 @@ def search_arxiv(query, max_results=5, category=None, sort_by="relevance"):
         })
     return papers
 
+
+def deduplicate_papers(paper_list):
+    """去重：用arXiv编号去重"""
+    seen = set()
+    unique_papers = []
+    for p in paper_list:
+        arxiv_id = p['pdf_link'].split('/')[-1].replace('.pdf', '')
+        if arxiv_id not in seen:
+            seen.add(arxiv_id)
+            unique_papers.append(p)
+    return unique_papers
+
 # 示例用法
 if __name__ == "__main__":
     papers = search_arxiv("chatgpt", max_results=3, sort_by="relevance")

@@ -13,7 +13,7 @@ def deepseek_chat(query: str) -> str:
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "deepseek-v3",
+        "model": "gpt-4o",
         "messages": [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": query}
@@ -24,6 +24,18 @@ def deepseek_chat(query: str) -> str:
     data = response.json()
     return data['choices'][0]['message']['content']
 
+def extract_keywords(natural_question):
+    prompt = (
+        f"请根据以下用户问题，提取适合在arXiv上检索的英文关键词或短语（每个关键词尽量简短、准确、用逗号分隔，不要有多余的解释，关键词限制5个以内）：\n\n"
+        f"用户问题：{natural_question}\n\n"
+        f"输出格式：keyword1, keyword2, ..."
+    )
+    keywords = deepseek_chat(prompt)
+    # 只保留关键词部分（去掉模型可能加的解释）
+    keywords = keywords.strip().split('\n')[0].replace('，', ',').replace(';', ',')
+    keywords = ','.join([kw.strip() for kw in keywords.split(',') if kw.strip()])
+    return keywords
+
 def summarize_and_rank_papers(question, papers):
     # 拼接 prompt
     context = "\n\n".join(
@@ -32,11 +44,12 @@ def summarize_and_rank_papers(question, papers):
     )
     prompt = (
         f"用户问题：{question}\n\n"
-        "以下是与问题相关的arXiv论文，请根据论文质量、相关性和新颖性对它们进行排序，"
-        "并给出简要总结。输出每篇论文的排序、标题、总结、一句话推荐理由。\n\n"
+        "以下是与问题相关的arXiv论文，请为相关性和新颖性分别打分，并通过总分对它们进行排序，"
+        "输出总分最高的5篇论文的相关性分，新颖性分，总分、标题、PDF地址、简要总结和这篇文章为啥可以回答用户相关问题。输出为中文\n\n"
         f"{context}"
     )
-    return deepseek_chat(prompt)
+    print(prompt)
+    return deepseek_chat(prompt[:10000])  # 限制最大长度，避免过长的请求
 
 # 示例用法
 if __name__ == "__main__":
